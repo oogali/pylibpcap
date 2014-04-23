@@ -54,7 +54,7 @@ sourcefiles += ["pcap_interface.c","exception.c","error.c"]
 # yay!
 
 class pcapclean(clean):
-    other_derived = [ 'pcap.py', 'pcap.c', 'constants.c', 'MANIFEST' ] 
+    other_derived = [ 'MANIFEST' ]
     def run (self):
         #if self.all:
         for derived in self.other_derived:
@@ -76,9 +76,9 @@ class pcap_build_ext(build_ext):
             else:
                 new_sources.append(source)
         return new_sources
-      
+
     def swig_sources(self, sources, extension=None):
-    
+
         """Walk the list of source files in 'sources', looking for SWIG
         interface (.i) files.  Run SWIG on all that are found, and
         return a modified 'sources' list with SWIG source files replaced
@@ -86,21 +86,21 @@ class pcap_build_ext(build_ext):
         """
 
         sources = self.before_swig_sources(sources)
-    
+
         new_sources = []
         swig_sources = []
         swig_targets = {}
-    
+
         # XXX this drops generated C/C++ files into the source tree, which
         # is fine for developers who want to distribute the generated
         # source -- but there should be an option to put SWIG output in
         # the temp dir.
-    
+
         if self.swig_cpp:
             target_ext = '.cpp'
         else:
             target_ext = '.c'
-    
+
         for source in sources:
             (base, ext) = os.path.splitext(source)
             if ext == ".i":             # SWIG interface file
@@ -109,15 +109,15 @@ class pcap_build_ext(build_ext):
                 swig_targets[source] = new_sources[-1]
             else:
                 new_sources.append(source)
-    
+
         if not swig_sources:
             return new_sources
-    
+
         swig = self.find_swig()
         swig_cmd = [swig, "-Wall", "-python", "-shadow", "-ISWIG"]
         if self.swig_cpp:
             swig_cmd.append("-c++")
-    
+
         for source in swig_sources:
             target = swig_targets[source]
             self.announce("swigging %s to %s" % (source, target))
@@ -128,7 +128,7 @@ class pcap_build_ext(build_ext):
 
             self.announce('doc-ifying swig-generated shadow class file %s' % 'pcap.py')
             self.spawn([sys.executable, './build-tools/docify-shadow.py', 'pcap.py'])
-    
+
         return new_sources
 
     # swig_sources ()
